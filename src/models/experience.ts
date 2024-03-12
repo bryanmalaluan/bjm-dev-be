@@ -13,6 +13,10 @@ const experienceSchema = new Schema({
     type: String,
     default: null,
   },
+  image: {
+    type: String,
+    default: "",
+  },
   startDate: {
     type: Date,
     default: null,

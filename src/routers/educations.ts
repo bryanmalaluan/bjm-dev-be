@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { assertError } from "../helpers/dataFormat";
 import { Education } from "../models/education";
 import { Router } from "express";
@@ -65,6 +66,13 @@ router.post("/", async (request, response) => {
 // update education
 router.put("/:id", async (request, response) => {
   try {
+    // validates object id
+    if (!mongoose.isValidObjectId(request.params.id)) {
+      return response
+        .status(400)
+        .json({ success: false, error: "Education id is invalid" });
+    }
+
     const result = await Education.findByIdAndUpdate(
       request.params.id,
       {

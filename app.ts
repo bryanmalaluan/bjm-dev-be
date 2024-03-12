@@ -8,6 +8,8 @@ import "dotenv/config";
 
 import educationRouters from "./src/routers/educations";
 import experienceRouters from "./src/routers/experiences";
+import professionalSkillRouters from "./src/routers/professionalSkills";
+import userRouters from "./src/routers/users";
 
 const app = express();
 const api = process.env.API_URL;
@@ -25,6 +27,8 @@ app.use(morgan("tiny"));
 // routers
 app.use(`${api}/educations`, educationRouters);
 app.use(`${api}/experiences`, experienceRouters);
+app.use(`${api}/professionalSkills`, professionalSkillRouters);
+app.use(`${api}/users`, userRouters);
 
 // static path for public uploads
 // provides access to folder

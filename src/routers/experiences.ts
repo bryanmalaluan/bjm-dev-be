@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { assertError } from "../helpers/dataFormat";
 import { Experience } from "../models/experience";
 import { Router } from "express";
@@ -66,6 +67,13 @@ router.post("/", async (request, response) => {
 // update experience
 router.put("/:id", async (request, response) => {
   try {
+    // validates object id
+    if (!mongoose.isValidObjectId(request.params.id)) {
+      return response
+        .status(400)
+        .json({ success: false, error: "Experience id is invalid" });
+    }
+
     const result = await Experience.findByIdAndUpdate(
       request.params.id,
       {
