@@ -10,6 +10,8 @@ import educationRouters from "./src/routers/educations";
 import experienceRouters from "./src/routers/experiences";
 import professionalSkillRouters from "./src/routers/professionalSkills";
 import userRouters from "./src/routers/users";
+import errorHandler from "./src/helpers/errorHandler";
+import authenticationJwt from "./src/helpers/jwt";
 
 const app = express();
 const api = process.env.API_URL;
@@ -21,8 +23,8 @@ app.options("*", cors());
 // middleware
 app.use(json());
 app.use(morgan("tiny"));
-// app.use(authenticationJwt());
-// app.use(errorHandler);
+app.use(authenticationJwt());
+app.use(errorHandler);
 
 // routers
 app.use(`${api}/educations`, educationRouters);

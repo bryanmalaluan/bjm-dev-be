@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { assertError } from "../helpers/dataFormat";
 import { User } from "../models/user";
 import { Router } from "express";
+import jwt from "jsonwebtoken";
 
 const router = Router();
 
@@ -30,7 +31,13 @@ router.get("/:id", async (request, response) => {
         .json({ success: false, error: "User id is invalid" });
     }
 
-    const user = await User.findById(request.params.id);
+    const user = await User.findById(request.params.id)
+      .populate("professionalSkills", "title rating")
+      .populate("educations", "school course specialization startDate endDate")
+      .populate(
+        "experiences",
+        "image jobTitle company summary startDate endDate isCurrent",
+      );
 
     if (!user) {
       return response
@@ -138,6 +145,41 @@ router.delete("/:id", async (request, response) => {
     response
       .status(200)
       .json({ success: true, message: "User has been deleted" });
+  } catch (error) {
+    const errorMessage = assertError(error);
+    response.status(500).json({ success: false, error: errorMessage });
+  }
+});
+
+/**
+ * generate jwt token
+ * @params password
+ */
+router.post("/token", async (request, response) => {
+  try {
+    if (
+      !request.body.password ||
+      request.body.password !== process.env.TOKEN_PASSWORD
+    ) {
+      return response.status(400).json({
+        success: false,
+        error: "You don't have access to generate a token",
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        tokenPassword: request.body.password, // payload to sign
+      },
+      process.env.JWT_SECRET ?? "", // secret key
+      {
+        expiresIn: "1d", // token expiration
+      },
+    );
+
+    return response
+      .status(200)
+      .json({ success: true, data: { token }, message: "Token generated" });
   } catch (error) {
     const errorMessage = assertError(error);
     response.status(500).json({ success: false, error: errorMessage });
