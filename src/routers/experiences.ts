@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { assertError } from "../helpers/dataFormat";
 import { Experience } from "../models/experience";
 import { Router } from "express";
+import { imageUploadOptions } from "../helpers/imageUpload";
 
 const router = Router();
 
@@ -38,12 +39,22 @@ router.get("/:id", async (request, response) => {
 });
 
 // create new experience
-router.post("/", async (request, response) => {
+router.post("/", imageUploadOptions.single('image'), async (request, response) => {
   try {
+    const imageFile = request.file;
+    let image = '';
+
+    if (imageFile) {
+       const imageFileName = request.file?.filename;
+       const basePath = `${request.protocol}://${request.get('host')}/public/uploads/`;
+       image = `${basePath}${imageFileName}`;
+    }
+
     let experience = new Experience({
       jobTitle: request.body.jobTitle,
       company: request.body.company,
       summary: request.body.summary,
+      image,
       startDate: request.body.startDate,
       endDate: request.body.endDate,
       isCurrent: request.body.isCurrent,
@@ -65,7 +76,7 @@ router.post("/", async (request, response) => {
 });
 
 // update experience
-router.put("/:id", async (request, response) => {
+router.put("/:id", imageUploadOptions.single('image'), async (request, response) => {
   try {
     // validates object id
     if (!mongoose.isValidObjectId(request.params.id)) {
@@ -74,12 +85,22 @@ router.put("/:id", async (request, response) => {
         .json({ success: false, error: "Experience id is invalid" });
     }
 
+    const imageFile = request.file;
+    let image = '';
+
+    if (imageFile) {
+       const imageFileName = request.file?.filename;
+       const basePath = `${request.protocol}://${request.get('host')}/public/uploads/`;
+       image = `${basePath}${imageFileName}`;
+    }
+
     const result = await Experience.findByIdAndUpdate(
       request.params.id,
       {
         jobTitle: request.body.jobTitle,
         company: request.body.company,
         summary: request.body.summary,
+        image,
         startDate: request.body.startDate,
         endDate: request.body.endDate,
         isCurrent: request.body.isCurrent,

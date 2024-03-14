@@ -3,8 +3,6 @@ import morgan from "morgan";
 import { connect } from "mongoose";
 import cors from "cors";
 import "dotenv/config";
-// import path from 'path';
-// import { fileURLToPath } from 'url';
 
 import educationRouters from "./src/routers/educations";
 import experienceRouters from "./src/routers/experiences";
@@ -34,7 +32,7 @@ app.use(`${api}/users`, userRouters);
 
 // static path for public uploads
 // provides access to folder
-// app.use('/public/uploads', express.static(__dirname + '/public/uploads'));
+app.use('/public/uploads', express.static(__dirname + '/public/uploads'));
 
 // database connection
 connect(process.env.CONNECTION_STRING ?? "")

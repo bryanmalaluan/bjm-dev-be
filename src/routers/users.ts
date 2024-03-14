@@ -3,6 +3,7 @@ import { assertError } from "../helpers/dataFormat";
 import { User } from "../models/user";
 import { Router } from "express";
 import jwt from "jsonwebtoken";
+import { imageUploadOptions } from "../helpers/imageUpload";
 
 const router = Router();
 
@@ -52,8 +53,17 @@ router.get("/:id", async (request, response) => {
 });
 
 // create new user
-router.post("/", async (request, response) => {
+router.post("/", imageUploadOptions.single('avatar'), async (request, response) => {
   try {
+    const imageFile = request.file;
+    let avatar = '';
+
+    if (imageFile) {
+       const imageFileName = request.file?.filename;
+       const basePath = `${request.protocol}://${request.get('host')}/public/uploads/`;
+       avatar = `${basePath}${imageFileName}`;
+    }
+
     let user = new User({
       firstName: request.body.firstName,
       lastName: request.body.lastName,
@@ -61,7 +71,7 @@ router.post("/", async (request, response) => {
       email: request.body.email,
       location: request.body.location,
       summary: request.body.summary,
-      avatar: request.body.avatar,
+      avatar,
       linkedIn: request.body.linkedIn,
       github: request.body.github,
       instagram: request.body.instagram,
@@ -87,13 +97,22 @@ router.post("/", async (request, response) => {
 });
 
 // update user
-router.put("/:id", async (request, response) => {
+router.put("/:id", imageUploadOptions.single('avatar'),  async (request, response) => {
   try {
     // validates object id
     if (!mongoose.isValidObjectId(request.params.id)) {
       return response
         .status(400)
         .json({ success: false, error: "User id is invalid" });
+    }
+
+    const imageFile = request.file;
+    let avatar = '';
+
+    if (imageFile) {
+       const imageFileName = request.file?.filename;
+       const basePath = `${request.protocol}://${request.get('host')}/public/uploads/`;
+       avatar = `${basePath}${imageFileName}`;
     }
 
     const result = await User.findByIdAndUpdate(
@@ -105,7 +124,7 @@ router.put("/:id", async (request, response) => {
         email: request.body.email,
         location: request.body.location,
         summary: request.body.summary,
-        avatar: request.body.avatar,
+        avatar,
         linkedIn: request.body.linkedIn,
         github: request.body.github,
         instagram: request.body.instagram,
