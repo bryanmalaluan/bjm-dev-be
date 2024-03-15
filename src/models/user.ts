@@ -21,6 +21,14 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  headline: {
+    type: String,
+    default: "",
+  },
+  introText: {
+    type: String,
+    default: "",
+  },
   summary: {
     type: String,
     default: "",
