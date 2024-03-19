@@ -10,6 +10,7 @@ import professionalSkillRouters from "./src/routers/professionalSkills";
 import userRouters from "./src/routers/users";
 import errorHandler from "./src/helpers/errorHandler";
 import authenticationJwt from "./src/helpers/jwt";
+import { AddressInfo } from "net";
 
 const app = express();
 const api = process.env.API_URL;
@@ -43,6 +44,8 @@ connect(process.env.CONNECTION_STRING ?? "")
     console.error("[Mongoose connection]: ", err);
   });
 
-app.listen(8010, () => {
-  console.log("Server is running http://localhost:8010");
+// connect to server
+var server = app.listen(process.env.PORT || 8010, () => {
+  var serverAddress = server.address() as AddressInfo;
+  console.log(`Server is running on port ${serverAddress?.port}`);
 });
