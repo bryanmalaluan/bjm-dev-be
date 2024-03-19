@@ -9,11 +9,11 @@
     "format:write": "prettier --write .",
     "lint:check": "eslint .",
     "lint:fix": "eslint --fix .",
-    "start": "node build/index.js",
+    "start": "node build/app.js",
     "postinstall": "tsc",
-    "watch-node": "nodemon build/index.js",
+    "watch-node": "nodemon build/app.js",
     "watch-ts": "tsc -w",
-    "deploy": "git add . && git commit -m Heroku && git push heroku main"
+    "deploy": "git add . && git commit -m Heroku deploy && git push heroku main"
   },
   "author": "",
   "license": "ISC",
