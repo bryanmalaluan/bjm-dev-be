@@ -53,73 +53,21 @@ router.get("/:id", async (request, response) => {
 });
 
 // create new user
-router.post("/", imageUploadOptions.single('avatar'), async (request, response) => {
-  try {
-    const imageFile = request.file;
-    let avatar = '';
+router.post(
+  "/",
+  imageUploadOptions.single("avatar"),
+  async (request, response) => {
+    try {
+      const imageFile = request.file;
+      let avatar = "";
 
-    if (imageFile) {
-       const imageFileName = request.file?.filename;
-       const basePath = `${request.protocol}://${request.get('host')}/public/uploads/`;
-       avatar = `${basePath}${imageFileName}`;
-    }
+      if (imageFile) {
+        const imageFileName = request.file?.filename;
+        const basePath = `${request.protocol}://${request.get("host")}/public/uploads/`;
+        avatar = `${basePath}${imageFileName}`;
+      }
 
-    let user = new User({
-      firstName: request.body.firstName,
-      lastName: request.body.lastName,
-      phone: request.body.phone,
-      email: request.body.email,
-      location: request.body.location,
-      headline: request.body.headline,
-      introText: request.body.introText,
-      summary: request.body.summary,
-      avatar,
-      linkedIn: request.body.linkedIn,
-      github: request.body.github,
-      instagram: request.body.instagram,
-      getInTouchText: request.body.getInTouchText,
-      professionalSkills: request.body.professionalSkills,
-      educations: request.body.educations,
-      experiences: request.body.experiences,
-      dateCreated: Date.now(),
-    });
-
-    const result = await user.save();
-
-    if (!result) {
-      return response
-        .status(400)
-        .json({ success: false, error: "User cannot be created" });
-    }
-    response.status(200).json({ success: true, data: result });
-  } catch (error) {
-    const errorMessage = assertError(error);
-    response.status(500).json({ success: false, error: errorMessage });
-  }
-});
-
-// update user
-router.put("/:id", imageUploadOptions.single('avatar'),  async (request, response) => {
-  try {
-    // validates object id
-    if (!mongoose.isValidObjectId(request.params.id)) {
-      return response
-        .status(400)
-        .json({ success: false, error: "User id is invalid" });
-    }
-
-    const imageFile = request.file;
-    let avatar = '';
-
-    if (imageFile) {
-       const imageFileName = request.file?.filename;
-       const basePath = `${request.protocol}://${request.get('host')}/public/uploads/`;
-       avatar = `${basePath}${imageFileName}`;
-    }
-
-    const result = await User.findByIdAndUpdate(
-      request.params.id,
-      {
+      let user = new User({
         firstName: request.body.firstName,
         lastName: request.body.lastName,
         phone: request.body.phone,
@@ -129,6 +77,7 @@ router.put("/:id", imageUploadOptions.single('avatar'),  async (request, respons
         introText: request.body.introText,
         summary: request.body.summary,
         avatar,
+        cv: request.body.cv,
         linkedIn: request.body.linkedIn,
         github: request.body.github,
         instagram: request.body.instagram,
@@ -136,24 +85,147 @@ router.put("/:id", imageUploadOptions.single('avatar'),  async (request, respons
         professionalSkills: request.body.professionalSkills,
         educations: request.body.educations,
         experiences: request.body.experiences,
-        dateModified: Date.now(),
-      },
-      {
-        new: true,
-      },
-    );
+        dateCreated: Date.now(),
+      });
 
-    if (!result) {
-      return response
-        .status(400)
-        .json({ success: false, error: "User cannot be updated!" });
+      const result = await user.save();
+
+      if (!result) {
+        return response
+          .status(400)
+          .json({ success: false, error: "User cannot be created" });
+      }
+      response.status(200).json({ success: true, data: result });
+    } catch (error) {
+      const errorMessage = assertError(error);
+      response.status(500).json({ success: false, error: errorMessage });
     }
-    response.status(200).json({ success: true, data: result });
-  } catch (error) {
-    const errorMessage = assertError(error);
-    response.status(500).json({ success: false, error: errorMessage });
-  }
-});
+  },
+);
+
+// update user
+router.put(
+  "/:id",
+  imageUploadOptions.single("avatar"),
+  async (request, response) => {
+    try {
+      // validates object id
+      if (!mongoose.isValidObjectId(request.params.id)) {
+        return response
+          .status(400)
+          .json({ success: false, error: "User id is invalid" });
+      }
+
+      const user = await User.findById(request.params.id);
+
+      if (!user) {
+        return response
+          .status(400)
+          .json({ success: false, error: "User not found" });
+      }
+
+      const imageFile = request.file;
+      let avatar = user.avatar;
+
+      if (imageFile) {
+        const imageFileName = request.file?.filename;
+        const basePath = `${request.protocol}://${request.get("host")}/public/uploads/`;
+        avatar = `${basePath}${imageFileName}`;
+      }
+
+      const result = await User.findByIdAndUpdate(
+        request.params.id,
+        {
+          firstName: request.body.firstName,
+          lastName: request.body.lastName,
+          phone: request.body.phone,
+          email: request.body.email,
+          location: request.body.location,
+          headline: request.body.headline,
+          introText: request.body.introText,
+          summary: request.body.summary,
+          avatar,
+          cv: request.body.cv,
+          linkedIn: request.body.linkedIn,
+          github: request.body.github,
+          instagram: request.body.instagram,
+          getInTouchText: request.body.getInTouchText,
+          professionalSkills: request.body.professionalSkills,
+          educations: request.body.educations,
+          experiences: request.body.experiences,
+          dateModified: Date.now(),
+        },
+        {
+          new: true,
+        },
+      );
+
+      if (!result) {
+        return response
+          .status(400)
+          .json({ success: false, error: "User cannot be updated!" });
+      }
+      response.status(200).json({ success: true, data: result });
+    } catch (error) {
+      const errorMessage = assertError(error);
+      response.status(500).json({ success: false, error: errorMessage });
+    }
+  },
+);
+
+// upload cv
+router.put(
+  "/upload/cv/:id",
+  imageUploadOptions.single("cv"),
+  async (request, response) => {
+    try {
+      // validates object id
+      if (!mongoose.isValidObjectId(request.params.id)) {
+        return response
+          .status(400)
+          .json({ success: false, error: "User id is invalid" });
+      }
+
+      const user = await User.findById(request.params.id);
+
+      if (!user) {
+        return response
+          .status(400)
+          .json({ success: false, error: "User not found" });
+      }
+
+      const imageFile = request.file;
+      let cv = user.cv;
+
+      if (imageFile) {
+        const imageFileName = request.file?.filename;
+        const basePath = `${request.protocol}://${request.get("host")}/public/uploads/`;
+        cv = `${basePath}${imageFileName}`;
+      }
+
+      const result = await User.findByIdAndUpdate(
+        request.params.id,
+        {
+          cv,
+          dateModified: Date.now(),
+        },
+        {
+          new: true,
+        },
+      );
+
+      if (!result) {
+        return response
+          .status(400)
+          .json({ success: false, error: "CV cannot be updated!" });
+      }
+      response.status(200).json({ success: true, data: result });
+    } catch (error) {
+      const errorMessage = assertError(error);
+      response.status(500).json({ success: false, error: errorMessage });
+    }
+  },
+);
 
 // delete professional skill
 router.delete("/:id", async (request, response) => {

@@ -32,7 +32,7 @@ app.use(`${api}/users`, userRouters);
 
 // static path for public uploads
 // provides access to folder
-app.use('/public/uploads', express.static(__dirname + '/public/uploads'));
+app.use("/public/uploads", express.static(__dirname + "/public/uploads"));
 
 // database connection
 connect(process.env.CONNECTION_STRING ?? "")

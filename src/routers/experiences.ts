@@ -39,64 +39,21 @@ router.get("/:id", async (request, response) => {
 });
 
 // create new experience
-router.post("/", imageUploadOptions.single('image'), async (request, response) => {
-  try {
-    const imageFile = request.file;
-    let image = '';
+router.post(
+  "/",
+  imageUploadOptions.single("image"),
+  async (request, response) => {
+    try {
+      const imageFile = request.file;
+      let image = "";
 
-    if (imageFile) {
-       const imageFileName = request.file?.filename;
-       const basePath = `${request.protocol}://${request.get('host')}/public/uploads/`;
-       image = `${basePath}${imageFileName}`;
-    }
+      if (imageFile) {
+        const imageFileName = request.file?.filename;
+        const basePath = `${request.protocol}://${request.get("host")}/public/uploads/`;
+        image = `${basePath}${imageFileName}`;
+      }
 
-    let experience = new Experience({
-      jobTitle: request.body.jobTitle,
-      company: request.body.company,
-      summary: request.body.summary,
-      image,
-      startDate: request.body.startDate,
-      endDate: request.body.endDate,
-      isCurrent: request.body.isCurrent,
-      dateCreated: Date.now(),
-    });
-
-    const result = await experience.save();
-
-    if (!result) {
-      return response
-        .status(400)
-        .json({ success: false, error: "Experience cannot be created!" });
-    }
-    response.status(200).json({ success: true, data: result });
-  } catch (error) {
-    const errorMessage = assertError(error);
-    response.status(500).json({ success: false, error: errorMessage });
-  }
-});
-
-// update experience
-router.put("/:id", imageUploadOptions.single('image'), async (request, response) => {
-  try {
-    // validates object id
-    if (!mongoose.isValidObjectId(request.params.id)) {
-      return response
-        .status(400)
-        .json({ success: false, error: "Experience id is invalid" });
-    }
-
-    const imageFile = request.file;
-    let image = '';
-
-    if (imageFile) {
-       const imageFileName = request.file?.filename;
-       const basePath = `${request.protocol}://${request.get('host')}/public/uploads/`;
-       image = `${basePath}${imageFileName}`;
-    }
-
-    const result = await Experience.findByIdAndUpdate(
-      request.params.id,
-      {
+      let experience = new Experience({
         jobTitle: request.body.jobTitle,
         company: request.body.company,
         summary: request.body.summary,
@@ -104,24 +61,75 @@ router.put("/:id", imageUploadOptions.single('image'), async (request, response)
         startDate: request.body.startDate,
         endDate: request.body.endDate,
         isCurrent: request.body.isCurrent,
-        dateModified: Date.now(),
-      },
-      {
-        new: true,
-      },
-    );
+        dateCreated: Date.now(),
+      });
 
-    if (!result) {
-      return response
-        .status(400)
-        .json({ success: false, error: "Experience cannot be updated!" });
+      const result = await experience.save();
+
+      if (!result) {
+        return response
+          .status(400)
+          .json({ success: false, error: "Experience cannot be created!" });
+      }
+      response.status(200).json({ success: true, data: result });
+    } catch (error) {
+      const errorMessage = assertError(error);
+      response.status(500).json({ success: false, error: errorMessage });
     }
-    response.status(200).json({ success: true, data: result });
-  } catch (error) {
-    const errorMessage = assertError(error);
-    response.status(500).json({ success: false, error: errorMessage });
-  }
-});
+  },
+);
+
+// update experience
+router.put(
+  "/:id",
+  imageUploadOptions.single("image"),
+  async (request, response) => {
+    try {
+      // validates object id
+      if (!mongoose.isValidObjectId(request.params.id)) {
+        return response
+          .status(400)
+          .json({ success: false, error: "Experience id is invalid" });
+      }
+
+      const imageFile = request.file;
+      let image = "";
+
+      if (imageFile) {
+        const imageFileName = request.file?.filename;
+        const basePath = `${request.protocol}://${request.get("host")}/public/uploads/`;
+        image = `${basePath}${imageFileName}`;
+      }
+
+      const result = await Experience.findByIdAndUpdate(
+        request.params.id,
+        {
+          jobTitle: request.body.jobTitle,
+          company: request.body.company,
+          summary: request.body.summary,
+          image,
+          startDate: request.body.startDate,
+          endDate: request.body.endDate,
+          isCurrent: request.body.isCurrent,
+          dateModified: Date.now(),
+        },
+        {
+          new: true,
+        },
+      );
+
+      if (!result) {
+        return response
+          .status(400)
+          .json({ success: false, error: "Experience cannot be updated!" });
+      }
+      response.status(200).json({ success: true, data: result });
+    } catch (error) {
+      const errorMessage = assertError(error);
+      response.status(500).json({ success: false, error: errorMessage });
+    }
+  },
+);
 
 // delete education
 router.delete("/:id", async (request, response) => {

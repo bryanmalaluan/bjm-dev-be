@@ -37,6 +37,10 @@ const userSchema = new Schema({
     type: String,
     default: "",
   },
+  cv: {
+    type: String,
+    default: null,
+  },
   linkedIn: {
     type: String,
   },
