@@ -4,12 +4,16 @@
   "description": "back-end of bjm.dev app",
   "main": "app.ts",
   "scripts": {
-    "start": "npx nodemon",
+    "start": "node build/app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "lint:check": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "postinstall": "tsc && mv -i -v public build/",
+    "watch-node": "nodemon build/app.js",
+    "watch-ts": "tsc -w",
+    "deploy": "git push heroku main"
   },
   "author": "",
   "license": "ISC",
